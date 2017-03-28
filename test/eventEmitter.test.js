@@ -1,9 +1,6 @@
 const assert = require('assert');
 const EventEmitter = require('../index.js');
 
-// TODO: check the (done)
-
-
 describe('Emitter tests', () => {
 
   var numberOfEmissions = 0;
@@ -22,13 +19,12 @@ describe('Emitter tests', () => {
     EventEmitter.unregisterAll(myEvent);
   };
 
-  it('registers a listener', (done) => {
+  it('registers a listener', () => {
     EventEmitter.register(myEvent, incrementListener);
     assert.deepEqual(EventEmitter.triggers[myEvent], [incrementListener]);
-    done();
   });
 
-  it('emits a listener', (done) => {
+  it('emits a listener', () => {
     cleanUp();
     EventEmitter.register(myEvent, incrementListener);
 
@@ -39,20 +35,17 @@ describe('Emitter tests', () => {
       assert.equal(numberOfEmissions, i+1);
       assert.equal(savedArgs, args);
     }
-    done();
   });
 
-  it('unregisters one listener', (done) => {
+  it('unregisters one listener', () => {
     cleanUp();
 
     EventEmitter.register(myEvent, incrementListener);
     EventEmitter.unregister(myEvent, incrementListener);
     assert.equal(EventEmitter.triggers[myEvent].length, 0);
-    done();
   });
 
-  it('unregisters all listeners', (done) => {
-    cleanUp();
+  it('unregisters all listeners', () => {
 
     for(var i = 0; i < 3; i++){
       EventEmitter.register(myEvent, function(args){}); // eslint-disable-line
@@ -61,10 +54,9 @@ describe('Emitter tests', () => {
     assert.equal(EventEmitter.triggers[myEvent].length, 3);
     EventEmitter.unregisterAll(myEvent);
     assert.equal(EventEmitter.triggers[myEvent].length, 0);
-    done();
   });
 
-  it('registers a listener once', (done) => {
+  it('registers a listener once', () => {
 
     cleanUp();
     EventEmitter.once(myEvent, incrementListener);
@@ -74,7 +66,6 @@ describe('Emitter tests', () => {
     assert.equal(numberOfEmissions, 1);
     assert.equal(savedArgs, args);
     assert.equal(EventEmitter.triggers[myEvent].length, 0);
-    done();
   });
 
 });
