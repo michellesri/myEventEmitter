@@ -1,37 +1,39 @@
 const assert = require('assert');
-const EventEmitter = require('../index.js');
+import {EventEmitter} from '../index.js';
 
 describe('Emitter tests', () => {
 
-  var numberOfEmissions = 0;
-  var savedArgs = null;
+  let ev = new EventEmitter();
+
+  let numberOfEmissions = 0;
+  let savedArgs = null;
   const args = ['args1', 'args2'];
   const myEvent = 'myEvent';
 
-  var incrementListener = function(args) {
+  let incrementListener = (args) => {
     numberOfEmissions++;
     savedArgs = args;
   };
 
-  var cleanUp = function(){
+  let cleanUp = () => {
     numberOfEmissions = 0;
     savedArgs = null;
-    EventEmitter.unregisterAll(myEvent);
+    ev.unregisterAll(myEvent);
   };
 
   it('registers a listener', () => {
-    EventEmitter.register(myEvent, incrementListener);
-    assert.deepEqual(EventEmitter.triggers[myEvent], [incrementListener]);
+    ev.register(myEvent, incrementListener);
+    assert.deepEqual(ev.triggers[myEvent], [incrementListener]);
   });
 
   it('emits a listener', () => {
     cleanUp();
-    EventEmitter.register(myEvent, incrementListener);
+    ev.register(myEvent, incrementListener);
 
-    for(var i = 0; i < 10; i++){
+    for(let i = 0; i < 10; i++){
       savedArgs = null;
       assert.equal(numberOfEmissions, i);
-      EventEmitter.emit(myEvent, args);
+      ev.emit(myEvent, args);
       assert.equal(numberOfEmissions, i+1);
       assert.equal(savedArgs, args);
     }
@@ -40,32 +42,32 @@ describe('Emitter tests', () => {
   it('unregisters one listener', () => {
     cleanUp();
 
-    EventEmitter.register(myEvent, incrementListener);
-    EventEmitter.unregister(myEvent, incrementListener);
-    assert.equal(EventEmitter.triggers[myEvent].length, 0);
+    ev.register(myEvent, incrementListener);
+    ev.unregister(myEvent, incrementListener);
+    assert.equal(ev.triggers[myEvent].length, 0);
   });
 
   it('unregisters all listeners', () => {
+    cleanUp();
 
-    for(var i = 0; i < 3; i++){
-      EventEmitter.register(myEvent, function(args){}); // eslint-disable-line
+    for(let i = 0; i < 3; i++){ //registers multiple listeners
+      ev.register(myEvent, (args) => {});
     }
 
-    assert.equal(EventEmitter.triggers[myEvent].length, 3);
-    EventEmitter.unregisterAll(myEvent);
-    assert.equal(EventEmitter.triggers[myEvent].length, 0);
+    assert.equal(ev.triggers[myEvent].length, 3);
+    ev.unregisterAll(myEvent);
+    assert.equal(ev.triggers[myEvent].length, 0);
   });
 
   it('registers a listener once', () => {
-
     cleanUp();
-    EventEmitter.once(myEvent, incrementListener);
-    assert.equal(EventEmitter.triggers[myEvent].length, 1);
+    ev.once(myEvent, incrementListener);
+    assert.equal(ev.triggers[myEvent].length, 1);
 
-    EventEmitter.emit(myEvent, args);
+    ev.emit(myEvent, args);
     assert.equal(numberOfEmissions, 1);
     assert.equal(savedArgs, args);
-    assert.equal(EventEmitter.triggers[myEvent].length, 0);
+    assert.equal(ev.triggers[myEvent].length, 0);
   });
 
 });
